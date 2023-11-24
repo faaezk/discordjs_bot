@@ -33,8 +33,6 @@ const execute = async (interaction) => {
 
     lib.python_calls([fp + 'commands.py', 'leaderboard', region, update])
         .then(async (result) => {
-            console.log('Python process output:\n', result);
-            console.log(typeof result)
             await interaction.editReply('```' + result + '```');
         })
         .catch((error) => {
