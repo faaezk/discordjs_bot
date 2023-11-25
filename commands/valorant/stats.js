@@ -5,7 +5,7 @@ const { fp } = require('../../config.json');
 
 const data = new SlashCommandBuilder()
     .setName('stats')
-    .setDescription('"Ranked statistics for all acts"')
+    .setDescription('Ranked statistics for all acts')
 	.addStringOption(option =>
 		option.setName('ign')
 			.setDescription('First part of the username (no #)')
