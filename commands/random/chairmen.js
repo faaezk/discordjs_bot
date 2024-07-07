@@ -2,28 +2,14 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { DB_API_URL } = require('../../config.json');
 
 const data = new SlashCommandBuilder()
-    .setName('stats')
-    .setDescription('Ranked statistics for all acts')
-	.addStringOption(option =>
-		option.setName('ign')
-			.setDescription('First part of the username (no #)')
-			.setRequired(true))
-
-    .addStringOption(option =>
-        option.setName('tag')
-            .setDescription('Second part of the username (no #)')
-            .setRequired(false));
+    .setName('chairmen')
+    .setDescription('Current chairmen for the rickies')
 
 const execute = async (interaction) => {
-	var ign = interaction.options.getString('ign');
-	var tag = interaction.options.getString('tag');
-    if (!tag) {
-        tag = "emptytag"
-    }
 
     await interaction.deferReply()
-    
-    fetch(`${DB_API_URL}/valorant/stats/${ign}/${tag}`)
+
+    fetch(`${DB_API_URL}/connected`)
     .then(response => {
         if (!response.ok) {
             console.log(response.json());
@@ -37,12 +23,13 @@ const execute = async (interaction) => {
         if ("error" in data) {
             await interaction.editReply(data.error);
         } else {
-            const updatedFields = data['fields'].map(item => ({ ...item, inline: true }));
             const embed = new EmbedBuilder()
                 .setColor(0x0099FF)
                 .setTitle(data['title'])
-                .setAuthor({ name: data['author'], iconURL: data['thumbnail'], url: data['url']})
-                .addFields(updatedFields);
+                .setURL(data['url'])
+                .setThumbnail('https://relayfm.s3.amazonaws.com/uploads/broadcast/image_3x/5/connected_artwork_0ecdaa3e-7019-4a34-86f7-f82d6a997144.png')
+                .setDescription('Current chairmen for the rickies')
+                .addFields(data['fields']);
             await interaction.editReply({ content: "woah", embeds: [embed] });
         }
     })

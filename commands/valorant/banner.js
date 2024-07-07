@@ -3,18 +3,18 @@ const { SlashCommandBuilder } = require('discord.js');
 
 
 const data = new SlashCommandBuilder()
-    .setName('graph')
-    .setDescription('MMR graph over time')
+    .setName('banner')
+    .setDescription('Shows a players banner')
 	.addStringOption(option =>
-		option.setName('in_game_names')
-			.setDescription('First part of the username (no #), separated by commas')
+		option.setName('username')
+			.setDescription('enter username as ign#tag')
 			.setRequired(true))
 
 const execute = async (interaction) => {
-    var ign_list = interaction.options.getString('in_game_names');
+    var username = interaction.options.getString('username');
     await interaction.deferReply()
 
-    fetch(`${DB_API_URL}/valorant/graph/${ign_list}`)
+    fetch(`${DB_API_URL}/valorant/banner/${username}`)
         .then(response => {
             if (!response.ok) {
                 console.log(response.json());
@@ -24,7 +24,9 @@ const execute = async (interaction) => {
             return response.json();
         })
 
-        .then(async data => {            
+        .then(async data => {
+            console.log(data); // Handle the data from the response
+            
             if ("error" in data) {
                 await interaction.editReply(data['error']);
             } else {

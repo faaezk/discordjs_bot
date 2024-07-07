@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const lib = require('../../python_calls');
-const { fp } = require('../../config.json');
+const { DB_API_URL } = require('../../config.json');
 
 const data = new SlashCommandBuilder()
     .setName('leaderboard')
@@ -18,7 +17,7 @@ const data = new SlashCommandBuilder()
 
     .addStringOption(option =>
         option.setName('update')
-            .setDescription('Latest data vs up to day old (for local)')
+            .setDescription('For local: Latest data vs since 12pm')
             .setRequired(false)
 			.addChoices(
 				{ name: 'True', value: 'true' },
@@ -29,15 +28,32 @@ const execute = async (interaction) => {
 	var region = interaction.options.getString('region');
 	var update = interaction.options.getString('update');
 
-    await interaction.deferReply()
+	if (!update) {
+        update = "false"
+    }
 
-    lib.python_calls([fp + 'commands.py', 'leaderboard', region, update])
-        .then(async (result) => {
-            await interaction.editReply('```' + result + '```');
-        })
-        .catch((error) => {
-            console.error('Error running Python process:', error);
-        });
+	if (update == 'true') {
+		await interaction.reply('Please wait...')
+	} else {
+		await interaction.deferReply()
+	}
+
+	fetch(`${DB_API_URL}/valorant/leaderboard/${region}/${update}`)
+		.then(response => {
+			if (!response.ok) {
+				console.log(response.json());
+				throw new Error('Network response was not ok ' + response.statusText);
+			}
+			
+			return response.json();
+		})
+
+		.then(async data => {
+			await interaction.editReply('```' + data['leaderboard'] + '```');
+		})
+		.catch(error => {
+			console.error('There was a problem with the fetch operation:', error);
+		});
 }
 
 module.exports = {
