@@ -27,29 +27,29 @@ const data = new SlashCommandBuilder()
 const execute = async (interaction) => {
 	var region = interaction.options.getString('region');
 	var update = interaction.options.getString('update');
+	var flag = true;
 
 	if (!update) {
-        update = "false"
-    }
-
-	if (update == 'true') {
-		await interaction.reply('Please wait...')
-	} else {
+		var url = `${DB_API_URL}/valorant/leaderboard/${region}`
 		await interaction.deferReply()
+    } else {
+		var url = `${DB_API_URL}/valorant/leaderboard/${region}/${update}`
+		await interaction.reply('Please wait...')
 	}
 
-	fetch(`${DB_API_URL}/valorant/leaderboard/${region}/${update}`)
+	fetch(url)
 		.then(response => {
 			if (!response.ok) {
-				console.log(response.json());
-				throw new Error('Network response was not ok ' + response.statusText);
+				return response.json().then(async error => {
+					flag = false;
+					await interaction.editReply({ content: error.message });
+				});
 			}
-			
-			return response.json();
 		})
-
 		.then(async data => {
-			await interaction.editReply('```' + data['leaderboard'] + '```');
+			if (flag) {
+				await interaction.editReply('```' + data['title'] + data['leaderboard'] + '```');
+			}
 		})
 		.catch(error => {
 			console.error('There was a problem with the fetch operation:', error);

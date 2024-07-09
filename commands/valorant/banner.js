@@ -6,34 +6,36 @@ const data = new SlashCommandBuilder()
     .setName('banner')
     .setDescription('Shows a players banner')
 	.addStringOption(option =>
-		option.setName('username')
-			.setDescription('enter username as ign#tag')
-			.setRequired(true))
+		option.setName('ign')
+			.setDescription('riot in-game name (first part of ign#tag)')
+            .setRequired(true))
+    
+    .addStringOption(option =>
+        option.setName('tag')
+            .setDescription('riot account tag (second part of ign#tag)')
+            .setRequired(false))
 
 const execute = async (interaction) => {
-    var username = interaction.options.getString('username');
-    await interaction.deferReply()
+    var ign = interaction.options.getString('ign');
+    var tag = interaction.options.getString('tag');
+    var url = (tag ? `${DB_API_URL}/valorant/banner/${ign}/${tag}` : `${DB_API_URL}/valorant/banner/${ign}`);
+    var flag = false;
 
-    fetch(`${DB_API_URL}/valorant/banner/${username}`)
+    await interaction.deferReply()
+    fetch(url)
         .then(response => {
             if (!response.ok) {
-                console.log(response.json());
-                throw new Error('Network response was not ok ' + response.statusText);
+                return response.json().then(async error => {
+                    flag = false;
+                    await interaction.editReply({ content: error.message });
+                });
             }
-            
-            return response.json();
         })
-
         .then(async data => {
-            console.log(data); // Handle the data from the response
-            
-            if ("error" in data) {
-                await interaction.editReply(data['error']);
-            } else {
+            if (flag) {
                 await interaction.editReply({ content: data['content'], files: [data['filepath']] });
             }
         })
-
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
         });

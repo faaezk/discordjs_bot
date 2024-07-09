@@ -2,7 +2,6 @@ const { DB_API_URL } = require('../../config.json');
 const { MAL_GRAPH_FP } = require('../../config.json');
 const { SlashCommandBuilder } = require('discord.js');
 
-
 const data = new SlashCommandBuilder()
     .setName('mal_graph')
     .setDescription('get')
@@ -40,21 +39,17 @@ const execute = async (interaction) => {
     var msg = "";
 
     await interaction.deferReply()
-
     fetch(`${DB_API_URL}/mal/graph/${category}/${type}/${title}`)
         .then(response => {
             if (!response.ok) {
-                console.log(response.json());
-                throw new Error('Network response was not ok ' + response.statusText);
+                return response.json().then(async error => {
+                    flag = false;
+                    await interaction.editReply({ content: error.message });
+                });
             }
-            
-            return response.json();
         })
-
-        .then(async data => {          
-            if ("error" in data) {
-                await interaction.editReply(data['error']);
-            } else {
+        .then(async data => {
+            if (flag) {
                 if (category == 'anime') {
                     msg = `- Completed: ${data['completed']}\n` +
                     `- Watching: ${data['watching']}\n` +
@@ -68,8 +63,8 @@ const execute = async (interaction) => {
                     `- Dropped: ${data['dropped']}\n` +
                     `- Total: ${data['total']}`;
                 }
-
-                await interaction.editReply({ content: msg, files: [MAL_GRAPH_FP] });
+                
+                await interaction.editReply({ content: msg, files: [data['filepath']] });
             }
         })
 
