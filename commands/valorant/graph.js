@@ -8,14 +8,24 @@ const data = new SlashCommandBuilder()
 	.addStringOption(option =>
 		option.setName('in_game_names')
 			.setDescription('First part of the username (no #), separated by commas')
-			.setRequired(true))
+            .setRequired(true))
+    .addStringOption(option =>
+        option.setName('acts')
+            .setDescription('Include act markings (individual only)')
+            .setRequired(false)
+            .addChoices(
+                { name: 'True', value: 'true' },
+                { name: 'False', value: 'false' }
+            ))
 
 const execute = async (interaction) => {
     var ign_list = interaction.options.getString('in_game_names');
+    var acts = interaction.options.getString('acts');
+    var url = (acts ? `${DB_API_URL}/valorant/graph/${ign_list}/${acts}` : `${DB_API_URL}/valorant/graph/${ign_list}`);
     var flag = true;
     await interaction.deferReply()
 
-    fetch(`${DB_API_URL}/valorant/graph/${ign_list}`)
+    fetch(url)
         .then(response => {
             if (!response.ok) {
                 return response.json().then(async error => {

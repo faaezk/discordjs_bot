@@ -1,5 +1,4 @@
 const { DB_API_URL } = require('../../config.json');
-const { MAL_GRAPH_FP } = require('../../config.json');
 const { SlashCommandBuilder } = require('discord.js');
 
 const data = new SlashCommandBuilder()
@@ -13,12 +12,10 @@ const data = new SlashCommandBuilder()
                 { name: 'Anime', value: 'anime' },
                 { name: 'Manga', value: 'manga' }
             ))
-        
 	.addStringOption(option =>
 		option.setName('title')
 			.setDescription('Enter title of the anime/manga')
             .setRequired(true))  
-
     .addStringOption(option =>
         option.setName('type')
             .setDescription('Only required for anime')
