@@ -20,8 +20,8 @@ const data = new SlashCommandBuilder()
             .setDescription('For local: Latest data vs since 12pm')
             .setRequired(false)
 			.addChoices(
-				{ name: 'True', value: true },
-				{ name: 'False', value: false }
+				{ name: 'True', value: 'true' },
+				{ name: 'False', value: 'false' }
 			));
 
 const execute = async (interaction) => {
@@ -29,7 +29,7 @@ const execute = async (interaction) => {
 	var update = interaction.options.getString('update');
 	var flag = true;
 
-	if (update) {
+	if (update == 'true') {
 		var url = `${DB_API_URL}/valorant/leaderboard/${region}/${update}`
 		await interaction.reply('Please wait...')
     } else {
