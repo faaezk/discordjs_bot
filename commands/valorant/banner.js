@@ -19,7 +19,7 @@ const execute = async (interaction) => {
     var ign = interaction.options.getString('ign');
     var tag = interaction.options.getString('tag');
     var url = (tag ? `${DB_API_URL}/valorant/banner/${ign}/${tag}` : `${DB_API_URL}/valorant/banner/${ign}`);
-    var flag = false;
+    var flag = true;
 
     await interaction.deferReply()
     fetch(url)
@@ -29,11 +29,14 @@ const execute = async (interaction) => {
                     flag = false;
                     await interaction.editReply({ content: error.message });
                 });
+                
+            } else {
+                return response.json();
             }
         })
         .then(async data => {
             if (flag) {
-                await interaction.editReply({ content: data['content'], files: [data['filepath']] });
+                await interaction.editReply({ content: data['content'], files: [data['file']] });
             }
         })
         .catch(error => {

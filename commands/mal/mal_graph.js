@@ -33,16 +33,21 @@ const execute = async (interaction) => {
     var category = interaction.options.getString('category');
     var title = interaction.options.getString('title');
     var type = interaction.options.getString('type');
+    var url = (type ? `${DB_API_URL}/mal/graph/${category}/${type}/${title}` : `${DB_API_URL}/mal/graph/${category}/${title}`);
+    var flag = true;
     var msg = "";
 
     await interaction.deferReply()
-    fetch(`${DB_API_URL}/mal/graph/${category}/${type}/${title}`)
+    fetch(url)
         .then(response => {
             if (!response.ok) {
                 return response.json().then(async error => {
                     flag = false;
                     await interaction.editReply({ content: error.message });
                 });
+                
+            } else {
+                return response.json();
             }
         })
         .then(async data => {
@@ -61,7 +66,7 @@ const execute = async (interaction) => {
                     `- Total: ${data['total']}`;
                 }
                 
-                await interaction.editReply({ content: msg, files: [data['filepath']] });
+                await interaction.editReply({ content: msg, files: [data['file']] });
             }
         })
 

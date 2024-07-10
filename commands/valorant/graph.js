@@ -23,8 +23,8 @@ const execute = async (interaction) => {
     var acts = interaction.options.getString('acts');
     var url = (acts ? `${DB_API_URL}/valorant/graph/${ign_list}/${acts}` : `${DB_API_URL}/valorant/graph/${ign_list}`);
     var flag = true;
-    await interaction.deferReply()
 
+    await interaction.deferReply()
     fetch(url)
         .then(response => {
             if (!response.ok) {
@@ -32,11 +32,14 @@ const execute = async (interaction) => {
                     flag = false;
                     await interaction.editReply({ content: error.message });
                 });
+                
+            } else {
+                return response.json();
             }
         })
         .then(async data => {
             if (flag) {
-                await interaction.editReply({ content: data['content'], files: [data['filepath']] });
+                await interaction.editReply({ content: data['content'], files: [data['file']] });
             }
         })
         .catch(error => {

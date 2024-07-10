@@ -17,8 +17,8 @@ const data = new SlashCommandBuilder()
 const execute = async (interaction) => {
     var ign = interaction.options.getString('ign');
     var tag = interaction.options.getString('tag');
-    var url = (tag ? `${DB_API_URL}/valorant/banner/${ign}/${tag}` : `${DB_API_URL}/valorant/banner/${ign}`);
-    var flag = false;
+    var url = (tag ? `${DB_API_URL}/valorant/stats/${ign}/${tag}` : `${DB_API_URL}/valorant/stats/${ign}`);
+    var flag = true;
 
     await interaction.deferReply()
     fetch(url)
@@ -28,6 +28,9 @@ const execute = async (interaction) => {
                     flag = false;
                     await interaction.editReply({ content: error.message });
                 });
+                
+            } else {
+                return response.json();
             }
         })
         .then(async data => {

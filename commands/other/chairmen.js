@@ -16,6 +16,9 @@ const execute = async (interaction) => {
                     flag = false;
                     await interaction.editReply({ content: error.message });
                 });
+                
+            } else {
+                return response.json();
             }
         })
         .then(async data => {
