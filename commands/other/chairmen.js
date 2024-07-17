@@ -10,7 +10,7 @@ const execute = async (interaction) => {
 
     await interaction.deferReply()
     fetch(`${DB_API_URL}/other/connected`)
-        .then(response => {
+        .then(async response => {
             if (!response.ok) {
                 return response.json().then(async error => {
                     flag = false;

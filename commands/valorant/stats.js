@@ -22,7 +22,7 @@ const execute = async (interaction) => {
 
     await interaction.deferReply()
     fetch(url)
-        .then(response => {
+        .then(async response => {
             if (!response.ok) {
                 return response.json().then(async error => {
                     flag = false;

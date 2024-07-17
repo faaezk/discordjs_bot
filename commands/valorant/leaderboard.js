@@ -38,7 +38,7 @@ const execute = async (interaction) => {
 	}
 
 	fetch(url)
-		.then(response => {
+		.then(async response => {
 			if (!response.ok) {
 				return response.json().then(async error => {
 					flag = false;
